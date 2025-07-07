@@ -1,0 +1,22 @@
+{
+  "name": "@left4code/svg-renderer",
+  "version": "1.0.0",
+  "description": "Responsive SVG path renderer that recalculates coordinates on container resize, transition, or animation.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "svg",
+    "path",
+    "renderer",
+    "responsive"
+  ],
+  "author": "Left4code",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
