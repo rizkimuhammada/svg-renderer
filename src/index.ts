@@ -124,11 +124,13 @@ function createSvgElement({
   paths,
   width,
   height,
+  enableBackdropBlur,
 }: {
   el: SVGSVGElement;
   paths: Paths;
   width: number;
   height: number;
+  enableBackdropBlur: boolean;
 }) {
   const prevWidth = el.getAttribute("data-width");
   const prevHeight = el.getAttribute("data-height");
@@ -160,6 +162,32 @@ function createSvgElement({
 
       el && el.appendChild(pathElement);
     });
+
+    // Backdrop blur masking
+    if (enableBackdropBlur) {
+      const serializer = new XMLSerializer();
+      const svgString = serializer.serializeToString(el);
+      const encoded = encodeURIComponent(svgString);
+      const dataUri = `data:image/svg+xml,${encoded}`;
+
+      let divMask = document.createElement("div");
+
+      if (
+        el.nextElementSibling?.hasAttribute("data-backdrop") &&
+        el.nextElementSibling instanceof HTMLDivElement
+      ) {
+        divMask = el.nextElementSibling;
+      }
+
+      divMask.style.maskImage = `url("${dataUri}")`;
+      divMask.style.maskRepeat = "no-repeat";
+      divMask.style.maskSize = "contain";
+      divMask.style.zIndex = "-1";
+      divMask.style.backdropFilter = "blur(10px)";
+      divMask.setAttribute("data-backdrop", "true");
+      divMask.setAttribute("class", el.getAttribute("class") ?? "");
+      el.parentNode?.insertBefore(divMask, el.nextSibling);
+    }
   }
 }
 
@@ -173,11 +201,13 @@ function createSvgElement({
 function setupSvgRenderer({
   el,
   paths,
+  enableBackdropBlur = false,
 }: {
   el: SVGSVGElement & {
     render?: () => void;
   };
   paths: Paths;
+  enableBackdropBlur?: boolean;
 }) {
   const parentElement = findRelativeParent(el) ?? el;
   const parentWidth = () =>
@@ -194,6 +224,7 @@ function setupSvgRenderer({
       paths,
       width,
       height,
+      enableBackdropBlur,
     });
   };
 
