@@ -74,7 +74,8 @@ function findRelativeParent(element) {
  *
  * @param params - Object containing target SVG element, Paths data, width, and height.
  */
-function createSvgElement({ el, paths, width, height, }) {
+function createSvgElement({ el, paths, width, height, enableBackdropBlur, }) {
+    var _a, _b, _c;
     const prevWidth = el.getAttribute("data-width");
     const prevHeight = el.getAttribute("data-height");
     if (prevWidth != width.toString() || prevHeight != height.toString()) {
@@ -97,6 +98,26 @@ function createSvgElement({ el, paths, width, height, }) {
             pathElement.style.shapeRendering = "geometricPrecision";
             el && el.appendChild(pathElement);
         });
+        // Backdrop blur masking
+        if (enableBackdropBlur) {
+            const serializer = new XMLSerializer();
+            const svgString = serializer.serializeToString(el);
+            const encoded = encodeURIComponent(svgString);
+            const dataUri = `data:image/svg+xml,${encoded}`;
+            let divMask = document.createElement("div");
+            if (((_a = el.nextElementSibling) === null || _a === void 0 ? void 0 : _a.hasAttribute("data-backdrop")) &&
+                el.nextElementSibling instanceof HTMLDivElement) {
+                divMask = el.nextElementSibling;
+            }
+            divMask.style.maskImage = `url("${dataUri}")`;
+            divMask.style.maskRepeat = "no-repeat";
+            divMask.style.maskSize = "contain";
+            divMask.style.zIndex = "-1";
+            divMask.style.backdropFilter = "blur(10px)";
+            divMask.setAttribute("data-backdrop", "true");
+            divMask.setAttribute("class", (_b = el.getAttribute("class")) !== null && _b !== void 0 ? _b : "");
+            (_c = el.parentNode) === null || _c === void 0 ? void 0 : _c.insertBefore(divMask, el.nextSibling);
+        }
     }
 }
 /**
@@ -106,7 +127,7 @@ function createSvgElement({ el, paths, width, height, }) {
  * @param params - Object containing the target SVG element and Paths data.
  * @returns An object with `destroy` function to clean up observers.
  */
-function setupSvgRenderer({ el, paths, }) {
+function setupSvgRenderer({ el, paths, enableBackdropBlur = false, }) {
     var _a;
     const parentElement = (_a = findRelativeParent(el)) !== null && _a !== void 0 ? _a : el;
     const parentWidth = () => parentElement === null || parentElement === void 0 ? void 0 : parentElement.getBoundingClientRect().width.toString();
@@ -119,6 +140,7 @@ function setupSvgRenderer({ el, paths, }) {
             paths,
             width,
             height,
+            enableBackdropBlur,
         });
     };
     el.render = render;

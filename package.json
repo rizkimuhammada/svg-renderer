@@ -1,9 +1,13 @@
 {
   "name": "@left4code/svg-renderer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Responsive SVG path renderer that recalculates coordinates on container resize, transition, or animation.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rizkimuhammada/svg-renderer.git"
+  },
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "npm run build"
