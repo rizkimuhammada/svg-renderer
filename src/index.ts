@@ -125,12 +125,14 @@ function createSvgElement({
   width,
   height,
   enableBackdropBlur,
+  enableViewBox,
 }: {
   el: SVGSVGElement;
   paths: Paths;
   width: number;
   height: number;
   enableBackdropBlur: boolean;
+  enableViewBox: boolean;
 }) {
   const prevWidth = el.getAttribute("data-width");
   const prevHeight = el.getAttribute("data-height");
@@ -141,6 +143,11 @@ function createSvgElement({
 
     // Clear previous paths
     el.querySelectorAll("path").forEach((path) => path.remove());
+
+    // Enable viewbox
+    if (enableViewBox) {
+      el.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    }
 
     // Create new paths
     createSvgPaths({
@@ -177,8 +184,12 @@ function createSvgElement({
         el.nextElementSibling instanceof HTMLDivElement
       ) {
         divMask = el.nextElementSibling;
+      } else {
+        divMask.style.opacity = "0";
       }
 
+      divMask.style.willChange = "backdrop-blur";
+      divMask.style.transition = "opacity 0.8s ease";
       divMask.style.maskImage = `url("${dataUri}")`;
       divMask.style.maskRepeat = "no-repeat";
       divMask.style.maskSize = "contain";
@@ -187,6 +198,10 @@ function createSvgElement({
       divMask.setAttribute("data-backdrop", "true");
       divMask.setAttribute("class", el.getAttribute("class") ?? "");
       el.parentNode?.insertBefore(divMask, el.nextSibling);
+
+      setTimeout(() => {
+        divMask.style.opacity = "1";
+      }, 0);
     }
   }
 }
@@ -202,12 +217,14 @@ function setupSvgRenderer({
   el,
   paths,
   enableBackdropBlur = false,
+  enableViewBox = false,
 }: {
   el: SVGSVGElement & {
     render?: () => void;
   };
   paths: Paths;
   enableBackdropBlur?: boolean;
+  enableViewBox?: boolean;
 }) {
   const parentElement = findRelativeParent(el) ?? el;
   const parentWidth = () =>
@@ -225,6 +242,7 @@ function setupSvgRenderer({
       width,
       height,
       enableBackdropBlur,
+      enableViewBox,
     });
   };
 

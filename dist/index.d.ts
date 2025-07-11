@@ -15,12 +15,13 @@ export type Paths = {
  * @param params - Object containing the target SVG element and Paths data.
  * @returns An object with `destroy` function to clean up observers.
  */
-declare function setupSvgRenderer({ el, paths, enableBackdropBlur, }: {
+declare function setupSvgRenderer({ el, paths, enableBackdropBlur, enableViewBox, }: {
     el: SVGSVGElement & {
         render?: () => void;
     };
     paths: Paths;
     enableBackdropBlur?: boolean;
+    enableViewBox?: boolean;
 }): {
     /**
      * Disconnects the ResizeObserver and cleans up listeners.
