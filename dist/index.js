@@ -167,6 +167,7 @@ function setupSvgRenderer({ el, paths, enableBackdropBlur = false, enableViewBox
     observer.observe(el);
     // Handle transitionstart → re-render until transition ends
     parentElement.addEventListener("transitionstart", () => {
+        console.log("run");
         let running = true;
         function loop() {
             if (!running)
@@ -179,9 +180,10 @@ function setupSvgRenderer({ el, paths, enableBackdropBlur = false, enableViewBox
             if (parentWidth().toString() == el.getAttribute("data-width") &&
                 parentHeight().toString() == el.getAttribute("data-height")) {
                 running = false;
+                console.log("stop");
             }
         }, { once: true });
-    }, { once: true });
+    });
     // Handle animationstart → re-render until animation ends
     parentElement.addEventListener("animationstart", () => {
         let running = true;
@@ -198,7 +200,7 @@ function setupSvgRenderer({ el, paths, enableBackdropBlur = false, enableViewBox
                 running = false;
             }
         }, { once: true });
-    }, { once: true });
+    });
     return {
         /**
          * Disconnects the ResizeObserver and cleans up listeners.
